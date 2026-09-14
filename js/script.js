@@ -1,0 +1,1286 @@
+// MY IT JOURNEY — interaksi ringan, stabil dan mesra pembentangan.
+
+document.addEventListener('DOMContentLoaded', () => {
+  const navigation = document.querySelector('.floating-nav');
+
+  // Menu mudah untuk skrin telefon.
+  if (navigation) {
+    const menuToggle = document.createElement('button');
+    menuToggle.className = 'nav-toggle';
+    menuToggle.type = 'button';
+    menuToggle.textContent = '☰ MENU';
+    menuToggle.setAttribute('aria-label', 'Buka menu navigasi');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    navigation.prepend(menuToggle);
+
+    menuToggle.addEventListener('click', () => {
+      const isOpen = navigation.classList.toggle('menu-open');
+      menuToggle.textContent = isOpen ? '× TUTUP' : '☰ MENU';
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    navigation.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navigation.classList.remove('menu-open');
+        menuToggle.textContent = '☰ MENU';
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // Tahun footer automatik + teknologi yang digunakan.
+  document.querySelectorAll('[data-year]').forEach((element) => {
+    element.textContent = new Date().getFullYear();
+  });
+  const footerInner = document.querySelector('.footer-inner');
+  if (footerInner && !footerInner.querySelector('.build-credit')) {
+    const credit = document.createElement('span');
+    credit.className = 'build-credit';
+    credit.textContent = 'DIBANGUNKAN DENGAN HTML • CSS • JAVASCRIPT';
+    footerInner.appendChild(credit);
+  }
+
+  // Prefetch semua halaman supaya pertukaran page lebih pantas dan audio lebih lancar.
+  const portfolioPages = ['index.html','profil.html','kemahiran.html','pendidikan.html','projek.html','pengalaman.html','kerjaya.html','hubungi.html'];
+  portfolioPages.forEach((href) => {
+    if (window.location.pathname.endsWith('/' + href) || (href === 'index.html' && window.location.pathname.endsWith('/'))) return;
+    const prefetch = document.createElement('link');
+    prefetch.rel = 'prefetch';
+    prefetch.href = href;
+    document.head.appendChild(prefetch);
+  });
+
+  // Borang demo: semak input tanpa menghantar data ke internet.
+  const form = document.querySelector('#contactForm');
+  if (form) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const fields = {
+        name: { input: form.elements.name, message: 'Sila masukkan nama.' },
+        email: { input: form.elements.email, message: 'Sila masukkan email yang sah.' },
+        message: { input: form.elements.message, message: 'Sila tulis mesej anda.' }
+      };
+
+      let valid = true;
+      Object.entries(fields).forEach(([key, field]) => {
+        const error = form.querySelector(`[data-error="${key}"]`);
+        const value = field.input.value.trim();
+        const emailOK = key !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        if (!value || !emailOK) {
+          if (error) error.textContent = field.message;
+          field.input.setAttribute('aria-invalid', 'true');
+          valid = false;
+        } else {
+          if (error) error.textContent = '';
+          field.input.removeAttribute('aria-invalid');
+        }
+      });
+
+      const status = form.querySelector('.form-status');
+      if (status) {
+        status.textContent = valid
+          ? 'Terima kasih! Borang demo berjaya disemak.'
+          : 'Sila semak ruangan yang ditandakan.';
+      }
+      if (valid) form.reset();
+    });
+  }
+
+  // Kad projek boleh ditekan untuk buka/tutup maklumat tambahan.
+  document.querySelectorAll('[data-project-card]').forEach((card) => {
+    const details = card.querySelector('.project-extra');
+    if (!details) return;
+
+    const toggleDetails = () => {
+      const expanded = card.getAttribute('aria-expanded') === 'true';
+      details.hidden = expanded;
+      card.setAttribute('aria-expanded', String(!expanded));
+    };
+
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('a, button, [data-project-preview]')) return;
+      toggleDetails();
+    });
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleDetails();
+      }
+    });
+  });
+
+  // Pautan projek yang belum diisi tidak akan membawa ke halaman kosong.
+  document.querySelectorAll('[data-project-link]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (link.getAttribute('href') === '#') {
+        event.preventDefault();
+        window.alert('Pautan projek belum dimasukkan. Gantikan href="#" dengan pautan hasil kerja sebenar.');
+      }
+    });
+  });
+
+  // Animasi masuk yang ringan.
+  const selectors = [
+    '.hero-section', '.page-intro', '.career-hero', '.statement-band',
+    '.intro-grid', '.audio-panel', '.info-card', '.skill-panel',
+    '.timeline-item', '.project-card', '.experience-item',
+    '.achievement-card', '.goal-card', '.contact-card', '.contact-form',
+    '.skill-command-center', '.skill-module-section', '.human-os-section'
+  ];
+  const items = document.querySelectorAll(selectors.join(','));
+  items.forEach((item) => item.classList.add('scroll-reveal'));
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach((item) => item.classList.add('is-visible'));
+  } else {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    items.forEach((item) => observer.observe(item));
+  }
+});
+
+/* =====================================================
+   Audio persistent antara halaman
+   Versi ini menggunakan SATU audio global di luar kandungan halaman.
+   Jika navigasi lancar (Live Server), lagu kekal berjalan tanpa restart.
+   Jika pelayar melakukan reload biasa, masa audio tetap disimpan dan disambung.
+   ===================================================== */
+(() => {
+  const STATE_KEY = 'my-it-journey-audio-state-v3';
+  const AUDIO_SRC = 'audio/portfolio-1min.mp3';
+
+  let audio = document.querySelector('#portfolioGlobalAudio');
+  if (!audio) {
+    audio = document.createElement('audio');
+    audio.id = 'portfolioGlobalAudio';
+    audio.src = AUDIO_SRC;
+    audio.loop = true;
+    audio.preload = 'metadata';
+    audio.hidden = true;
+    audio.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(audio);
+  }
+  audio.loop = true;
+
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  };
+
+  const readState = () => {
+    try {
+      const raw = sessionStorage.getItem(STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  let restoring = true;
+  let autoplayBlocked = false;
+  let lastSavedAt = 0;
+  const SAVE_INTERVAL_MS = 1000;
+
+  const writeState = (force = false) => {
+    const now = Date.now();
+    if (!force && now - lastSavedAt < SAVE_INTERVAL_MS) return;
+    lastSavedAt = now;
+    try {
+      sessionStorage.setItem(STATE_KEY, JSON.stringify({
+        currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+        playing: !audio.paused && !audio.ended,
+        muted: Boolean(audio.muted),
+        volume: Number.isFinite(audio.volume) ? audio.volume : 1,
+        savedAt: now
+      }));
+    } catch (_) {}
+  };
+
+  window.__portfolioAudioSave = () => writeState(true);
+
+  const getHomeControls = () => {
+    const homePlayer = document.querySelector('[data-audio-player]');
+    return {
+      homePlayer,
+      homePlay: homePlayer ? homePlayer.querySelector('[data-play]') : null,
+      homeMute: homePlayer ? homePlayer.querySelector('[data-mute]') : null,
+      homeProgress: homePlayer ? homePlayer.querySelector('[data-progress]') : null,
+      homeTime: homePlayer ? homePlayer.querySelector('[data-time]') : null
+    };
+  };
+
+  const dock = document.createElement('div');
+  dock.className = 'persistent-audio-dock';
+  dock.setAttribute('role', 'group');
+  dock.setAttribute('aria-label', 'Kawalan audio portfolio');
+  dock.innerHTML = `
+    <button class="persistent-audio-play" type="button" data-persistent-play aria-label="Mainkan audio">▶</button>
+    <div class="persistent-audio-info">
+      <div class="persistent-audio-topline">
+        <span class="persistent-audio-title"><span class="persistent-audio-eq" aria-hidden="true"><i></i><i></i><i></i></span>MY IT JOURNEY</span>
+        <span class="persistent-audio-time" data-persistent-time>0:00</span>
+      </div>
+      <div class="persistent-audio-status" data-persistent-status>Audio portfolio • 1 minit</div>
+    </div>
+    <button class="persistent-audio-mute" type="button" data-persistent-mute aria-label="Senyapkan audio">🔊</button>`;
+  document.body.appendChild(dock);
+
+  const dockPlay = dock.querySelector('[data-persistent-play]');
+  const dockMute = dock.querySelector('[data-persistent-mute]');
+  const dockTime = dock.querySelector('[data-persistent-time]');
+  const dockStatus = dock.querySelector('[data-persistent-status]');
+
+  const updateUI = () => {
+    const { homePlayer, homePlay, homeMute, homeProgress, homeTime } = getHomeControls();
+    const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 60;
+    const percent = duration > 0 ? (audio.currentTime / duration) * 100 : 0;
+    const isPlaying = !audio.paused && !audio.ended;
+
+    if (homeProgress) homeProgress.value = String(Math.max(0, Math.min(100, percent)));
+    if (homeTime) homeTime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
+    if (homePlay) {
+      homePlay.textContent = isPlaying ? '❚❚' : '▶';
+      homePlay.setAttribute('aria-label', isPlaying ? 'Jeda audio' : 'Mainkan audio');
+    }
+    if (homeMute) homeMute.textContent = audio.muted ? '🔇' : '🔊';
+
+    dock.classList.toggle('is-home', Boolean(homePlayer));
+    dockPlay.textContent = isPlaying ? '❚❚' : '▶';
+    dockPlay.setAttribute('aria-label', isPlaying ? 'Jeda audio' : 'Mainkan audio');
+    dockMute.textContent = audio.muted ? '🔇' : '🔊';
+    dockTime.textContent = formatTime(audio.currentTime);
+    dock.classList.toggle('is-playing', isPlaying);
+
+    if (autoplayBlocked && !isPlaying) {
+      dockStatus.textContent = 'Klik ▶ untuk sambung audio';
+    } else if (isPlaying) {
+      dockStatus.textContent = 'Sedang dimainkan • kekal antara halaman';
+    } else {
+      dockStatus.textContent = 'Audio portfolio • 1 minit';
+    }
+  };
+
+  const togglePlay = async () => {
+    if (audio.paused) {
+      try {
+        await audio.play();
+        autoplayBlocked = false;
+      } catch (_) {
+        autoplayBlocked = true;
+      }
+    } else {
+      audio.pause();
+      autoplayBlocked = false;
+    }
+    writeState(true);
+    updateUI();
+  };
+
+  const toggleMute = () => {
+    audio.muted = !audio.muted;
+    writeState(true);
+    updateUI();
+  };
+
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('[data-play]') || event.target.closest('[data-persistent-play]')) {
+      event.preventDefault();
+      togglePlay();
+      return;
+    }
+    if (event.target.closest('[data-mute]') || event.target.closest('[data-persistent-mute]')) {
+      event.preventDefault();
+      toggleMute();
+    }
+  });
+
+  document.addEventListener('input', (event) => {
+    const progress = event.target.closest('[data-progress]');
+    if (!progress) return;
+    const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    if (duration > 0) {
+      audio.currentTime = (Number(progress.value) / 100) * duration;
+      writeState(true);
+      updateUI();
+    }
+  });
+
+  const restoreState = async () => {
+    const state = readState();
+    if (state) {
+      const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 60;
+      const base = Number.isFinite(Number(state.currentTime)) ? Number(state.currentTime) : 0;
+      const elapsed = state.playing && Number.isFinite(Number(state.savedAt))
+        ? Math.max(0, (Date.now() - Number(state.savedAt)) / 1000)
+        : 0;
+      let target = base + elapsed;
+      if (duration > 0) target %= duration;
+
+      try { audio.currentTime = Math.max(0, Math.min(duration, target)); } catch (_) {}
+      audio.muted = Boolean(state.muted);
+      if (Number.isFinite(Number(state.volume))) {
+        audio.volume = Math.max(0, Math.min(1, Number(state.volume)));
+      }
+
+      if (state.playing) {
+        try {
+          await audio.play();
+          autoplayBlocked = false;
+        } catch (_) {
+          autoplayBlocked = true;
+        }
+      }
+    }
+    restoring = false;
+    updateUI();
+  };
+
+  if (audio.readyState >= 1) {
+    restoreState();
+  } else {
+    audio.addEventListener('loadedmetadata', restoreState, { once: true });
+  }
+
+  ['timeupdate', 'play', 'pause', 'volumechange', 'loadedmetadata'].forEach((eventName) => {
+    audio.addEventListener(eventName, () => {
+      updateUI();
+      if (!restoring) writeState(eventName !== 'timeupdate');
+    });
+  });
+
+  const videoPausedAudio = new WeakSet();
+  document.addEventListener('play', (event) => {
+    const videoEl = event.target;
+    if (!(videoEl instanceof HTMLVideoElement)) return;
+    if (!audio.paused && !audio.ended) {
+      videoPausedAudio.add(videoEl);
+      audio.pause();
+      writeState(true);
+      updateUI();
+    }
+  }, true);
+
+  const resumeAfterVideo = async (videoEl) => {
+    if (!videoPausedAudio.has(videoEl)) return;
+    videoPausedAudio.delete(videoEl);
+    try {
+      await audio.play();
+      autoplayBlocked = false;
+    } catch (_) {
+      autoplayBlocked = true;
+    }
+    writeState(true);
+    updateUI();
+  };
+
+  document.addEventListener('ended', (event) => {
+    if (event.target instanceof HTMLVideoElement) resumeAfterVideo(event.target);
+  }, true);
+  document.addEventListener('pause', (event) => {
+    if (event.target instanceof HTMLVideoElement && !event.target.ended) resumeAfterVideo(event.target);
+  }, true);
+
+  window.__portfolioAudioRefresh = updateUI;
+  window.addEventListener('pagehide', () => writeState(true));
+  window.addEventListener('beforeunload', () => writeState(true));
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') writeState(true);
+  });
+
+  updateUI();
+})();
+
+/* =====================================================
+   Scroll progress — elemen interaktif kecil, tidak membebankan.
+   ===================================================== */
+(() => {
+  const track = document.createElement('div');
+  track.className = 'page-progress-track';
+  track.setAttribute('aria-hidden', 'true');
+  track.innerHTML = '<span class="page-progress-bar"></span>';
+  document.body.appendChild(track);
+  const bar = track.querySelector('.page-progress-bar');
+  let ticking = false;
+
+  const update = () => {
+    const doc = document.documentElement;
+    const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+    const percent = Math.max(0, Math.min(100, (window.scrollY / max) * 100));
+    bar.style.width = `${percent}%`;
+    ticking = false;
+  };
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+
+/* =====================================================
+   Bubble cursor + floating 3D theme switch + light page transition
+   ===================================================== */
+(() => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = !reducedMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches; // Bubble cursor aktif pada laptop/desktop sahaja.
+
+  // Theme: butang kecil terapung di tepi skrin.
+  // Ikon menunjukkan tema yang AKAN dibuka: ☀ ketika dark, ☾ ketika light.
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  const setTheme = (theme) => {
+    const safeTheme = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = safeTheme;
+    try { localStorage.setItem('my-it-journey-theme', safeTheme); } catch (_) {}
+  };
+
+  const themeButton = document.createElement('button');
+  themeButton.className = 'theme-fab';
+  themeButton.type = 'button';
+  document.body.appendChild(themeButton);
+
+  const syncThemeButton = () => {
+    const currentIsLight = getTheme() === 'light';
+    const targetName = currentIsLight ? 'Dark' : 'Light';
+    const targetIcon = currentIsLight ? '☾' : '☀';
+    themeButton.innerHTML = `<span class="theme-fab-icon" aria-hidden="true">${targetIcon}</span><span class="theme-fab-tip">${targetName}</span>`;
+    themeButton.setAttribute('aria-label', `Tukar ke tema ${targetName}`);
+    themeButton.title = `Tukar ke ${targetName}`;
+  };
+  syncThemeButton();
+
+  themeButton.addEventListener('click', () => {
+    const next = getTheme() === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    syncThemeButton();
+    if (!reducedMotion) {
+      themeButton.classList.remove('is-switching');
+      void themeButton.offsetWidth;
+      themeButton.classList.add('is-switching');
+      window.setTimeout(() => themeButton.classList.remove('is-switching'), 360);
+    }
+  });
+
+  // Kemasukan halaman: sangat ringan supaya tak rasa lag.
+  if (!reducedMotion) {
+    document.body.classList.add('page-enter-lite');
+    window.setTimeout(() => document.body.classList.remove('page-enter-lite'), 720);
+  }
+
+  // Cursor bubble untuk laptop / desktop.
+  if (finePointer) {
+    const cursor = document.createElement('div');
+    cursor.className = 'bubble-cursor';
+    cursor.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cursor);
+
+    let mouseX = -100;
+    let mouseY = -100;
+    let cursorX = -100;
+    let cursorY = -100;
+    let rafId = null;
+    let idleTimer = null;
+
+    const animateCursor = () => {
+      cursorX += (mouseX - cursorX) * 0.32;
+      cursorY += (mouseY - cursorY) * 0.32;
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) scale(${cursor.classList.contains('is-clicking') ? .80 : 1})`;
+      if (Math.abs(mouseX - cursorX) > 0.2 || Math.abs(mouseY - cursorY) > 0.2) {
+        rafId = requestAnimationFrame(animateCursor);
+      } else {
+        rafId = null;
+      }
+    };
+
+    document.addEventListener('mousemove', (event) => {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+      cursor.classList.add('is-visible');
+      if (idleTimer) window.clearTimeout(idleTimer);
+      if (!rafId) rafId = requestAnimationFrame(animateCursor);
+      idleTimer = window.setTimeout(() => {
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      }, 120);
+    });
+    document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
+    document.addEventListener('mouseenter', () => cursor.classList.add('is-visible'));
+
+    const interactiveSelector = 'a, button, .project-card, input[type="range"]';
+    document.addEventListener('mouseover', (event) => {
+      if (event.target.closest(interactiveSelector)) cursor.classList.add('is-active');
+    });
+    document.addEventListener('mouseout', (event) => {
+      if (event.target.closest(interactiveSelector)) cursor.classList.remove('is-active');
+    });
+    document.addEventListener('mousedown', () => cursor.classList.add('is-clicking'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('is-clicking'));
+
+    window.addEventListener('pagehide', () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    }, { once: true });
+  }
+
+  // Transition halaman ringan: "digital glass swipe" + navigasi tanpa reload penuh.
+  const transition = document.createElement('div');
+  transition.className = 'page-transition-lite';
+  transition.setAttribute('aria-hidden', 'true');
+  transition.innerHTML = `
+    <span class="transition-slab slab-a"></span>
+    <span class="transition-slab slab-b"></span>
+    <span class="transition-beam"></span>
+    <span class="transition-diamond">◇</span>`;
+  document.body.appendChild(transition);
+
+  let navigating = false;
+  const parser = new DOMParser();
+  const pageCache = new Map();
+
+  const shouldAnimateLink = (link, event) => {
+    if (!link || navigating) return false;
+    if (event.defaultPrevented || event.button !== 0) return false;
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return false;
+    if (link.target === '_blank' || link.hasAttribute('download')) return false;
+
+    const rawHref = link.getAttribute('href');
+    if (!rawHref || rawHref.startsWith('#') || rawHref.startsWith('mailto:') || rawHref.startsWith('tel:') || rawHref.startsWith('javascript:')) return false;
+
+    const destination = new URL(link.href, window.location.href);
+    if (destination.origin !== window.location.origin) return false;
+    if (destination.pathname === window.location.pathname && destination.hash) return false;
+    return destination.pathname.endsWith('.html') || destination.pathname.endsWith('/');
+  };
+
+  const setActiveNavigation = (url) => {
+    const destination = new URL(url, window.location.href);
+    const destFile = destination.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.floating-nav a').forEach((navLink) => {
+      const navUrl = new URL(navLink.href, window.location.href);
+      const navFile = navUrl.pathname.split('/').pop() || 'index.html';
+      navLink.classList.toggle('active', navFile === destFile);
+    });
+  };
+
+  const fetchPage = async (url) => {
+    if (window.location.protocol === 'file:') {
+      // Sesetengah browser tidak benarkan fetch fail tempatan. Fallback reload biasa digunakan.
+      throw new Error('Local file navigation fallback');
+    }
+    const normalized = new URL(url, window.location.href).href;
+    if (pageCache.has(normalized)) return pageCache.get(normalized);
+    const response = await fetch(normalized, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Gagal membuka ${normalized}`);
+    const html = await response.text();
+    pageCache.set(normalized, html);
+    return html;
+  };
+
+  const applyPage = (html, url, push = true) => {
+    const newDoc = parser.parseFromString(html, 'text/html');
+    const newMain = newDoc.querySelector('main');
+    const currentMain = document.querySelector('main');
+    if (!newMain || !currentMain) throw new Error('Struktur halaman tidak lengkap');
+
+    // Modal berada di luar <main>. Buang modal lama semasa halaman bertukar
+    // supaya popup Resume/Sijil tidak tertinggal di atas halaman baharu.
+    document.querySelectorAll('.portfolio-modal').forEach((modal) => modal.remove());
+    document.body.classList.remove('modal-open');
+
+    currentMain.replaceWith(document.importNode(newMain, true));
+    document.title = newDoc.title || document.title;
+    setActiveNavigation(url);
+    if (push) window.history.pushState({ portfolioPage: true }, '', url);
+
+    document.body.classList.remove('is-leaving-lite');
+    transition.classList.remove('is-running');
+    if (!reducedMotion) {
+      document.body.classList.remove('page-enter-lite');
+      void document.body.offsetWidth;
+      document.body.classList.add('page-enter-lite');
+      window.setTimeout(() => document.body.classList.remove('page-enter-lite'), 720);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    if (typeof window.__portfolioAudioRefresh === 'function') window.__portfolioAudioRefresh();
+    if (typeof window.__portfolioEnhanceDynamicContent === 'function') window.__portfolioEnhanceDynamicContent(document.querySelector('main'));
+    // Keep the language selected on Home across seamless page changes.
+    // The page shell is replaced without a full reload, so re-apply the current
+    // language after the new main content and dynamic popups have been inserted.
+    if (typeof window.__portfolioApplyLanguage === 'function') {
+      window.__portfolioApplyLanguage(window.__portfolioGetLanguage ? window.__portfolioGetLanguage() : 'ms');
+    }
+  };
+
+  const fallbackNavigate = (url) => {
+    if (typeof window.__portfolioAudioSave === 'function') window.__portfolioAudioSave();
+    transition.classList.add('is-running');
+    document.body.classList.add('is-leaving-lite');
+    window.setTimeout(() => {
+      window.location.href = url;
+    }, reducedMotion ? 0 : 720);
+  };
+
+  const navigateSeamlessly = async (url, push = true) => {
+    navigating = true;
+    if (typeof window.__portfolioAudioSave === 'function') window.__portfolioAudioSave();
+    transition.classList.add('is-running');
+    document.body.classList.add('is-leaving-lite');
+
+    try {
+      const html = await fetchPage(url);
+      window.setTimeout(() => {
+        try {
+          applyPage(html, url, push);
+        } catch (_) {
+          fallbackNavigate(url);
+        } finally {
+          navigating = false;
+        }
+      }, reducedMotion ? 0 : 520);
+    } catch (_) {
+      navigating = false;
+      fallbackNavigate(url);
+    }
+  };
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a');
+    if (!shouldAnimateLink(link, event)) return;
+
+    // Jika link ditekan dari dalam popup (contohnya Resume -> Hubungi Saya),
+    // tutup popup dahulu supaya ia tidak kekal menutupi halaman destinasi.
+    const openModal = link.closest('.portfolio-modal.is-open');
+    if (openModal) {
+      openModal.classList.remove('is-open');
+      openModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+    }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    navigateSeamlessly(link.href, true);
+  }, true);
+
+  window.addEventListener('popstate', () => {
+    navigateSeamlessly(window.location.href, false);
+  });
+
+  window.addEventListener('pageshow', () => {
+    navigating = false;
+    document.body.classList.remove('is-leaving-lite');
+    transition.classList.remove('is-running');
+    setActiveNavigation(window.location.href);
+  });
+})();
+
+/* =====================================================
+   Intro loading ringkas — hanya sekali setiap sesi browser.
+   ===================================================== */
+(() => {
+  const loader = document.querySelector('.site-intro-loader');
+  if (!loader || !document.documentElement.classList.contains('intro-pending')) return;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const delay = reduced ? 360 : 1250;
+
+  window.setTimeout(() => {
+    loader.classList.add('is-finished');
+    try { sessionStorage.setItem('my-it-journey-intro-shown', '1'); } catch (_) {}
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('intro-pending');
+      loader.remove();
+    }, reduced ? 0 : 250);
+  }, delay);
+})();
+
+/* =====================================================
+   EXTRA PORTFOLIO FEATURES
+   Resume ringkas, galeri sijil, Credits dan Back to Top.
+   ===================================================== */
+(() => {
+  const createModal = ({ id, kicker, title, bodyHTML }) => {
+    const modal = document.createElement('div');
+    modal.className = 'portfolio-modal';
+    modal.id = id;
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="portfolio-modal-card" role="document">
+        <div class="portfolio-modal-head">
+          <div><p class="section-kicker">${kicker}</p><h3>${title}</h3></div>
+          <button class="portfolio-modal-close" type="button" aria-label="Tutup"><span aria-hidden="true">×</span><span>TUTUP</span></button>
+        </div>
+        <div class="portfolio-modal-body">${bodyHTML}</div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    const closeButton = modal.querySelector('.portfolio-modal-close');
+    let lastFocus = null;
+    const open = () => {
+      lastFocus = document.activeElement;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      closeButton.focus();
+    };
+    const close = () => {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    };
+    closeButton.addEventListener('click', close);
+    modal.addEventListener('click', (event) => { if (event.target === modal) close(); });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('is-open')) close();
+    });
+    return { modal, open, close };
+  };
+
+  window.__portfolioCreateModal = createModal;
+
+  // Resume digital pada Home menggunakan maklumat yang sudah ada dalam portfolio.
+  const resumeButton = document.querySelector('[data-resume-open]');
+  if (resumeButton) {
+    const resume = createModal({
+      id: 'resumeModal',
+      kicker: 'RESUME RINGKAS / PROFIL PROFESIONAL',
+      title: 'Nurshakila Marlisa',
+      bodyHTML: `
+        <div class="resume-sheet">
+          <aside class="resume-sidebar">
+            <div class="resume-photo-frame">
+              <img src="images/resume-profile.jpg" alt="Gambar profil Nurshakila Marlisa">
+              <span class="resume-photo-accent" aria-hidden="true"></span>
+            </div>
+            <p class="resume-role-label">PELAJAR TEKNOLOGI MAKLUMAT</p>
+            <div class="resume-side-section">
+              <h4>Maklumat Ringkas</h4>
+              <p><span>Lokasi</span><strong>Kota Tinggi, Johor</strong></p>
+              <p><span>Umur</span><strong>18 Tahun</strong></p>
+              <p><span>Pengajian</span><strong>Diploma Teknologi Maklumat</strong></p>
+            </div>
+            <div class="resume-side-section">
+              <h4>Hubungi</h4>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nurshakilamarlisa@gmail.com" target="_blank" rel="noopener noreferrer">✉ <span>Email</span></a>
+              <a href="https://www.wasap.my/60197080852/" target="_blank" rel="noopener noreferrer">◉ <span>0197080852</span></a>
+            </div>
+          </aside>
+
+          <div class="resume-main">
+            <header class="resume-name-header">
+              <span class="resume-small-label">RESUME DIGITAL</span>
+              <h4>Nurshakila Marlisa Binti Abdullah</h4>
+              <p>Pelajar Diploma Teknologi Maklumat Semester 1 • Kolej Vokasional Kluang</p>
+              <div class="resume-mini-tags"><span>Web</span><span>Grafik</span><span>Multimedia</span></div>
+            </header>
+
+            <div class="resume-summary-grid">
+              <section class="resume-section-card">
+                <h4>Profil</h4>
+                <p>Berminat dalam pembangunan web, grafik dan multimedia. Suka mencuba perkara baharu, meneroka idea kreatif dan menambah baik hasil kerja dari semasa ke semasa.</p>
+              </section>
+              <section class="resume-section-card">
+                <h4>Fokus Kerjaya</h4>
+                <p>Pembangunan Web & Multimedia — menggabungkan teknologi, reka bentuk dan kreativiti untuk menghasilkan pengalaman digital yang menarik dan mudah digunakan.</p>
+              </section>
+            </div>
+
+            <section class="resume-section-card resume-education">
+              <h4>Pendidikan</h4>
+              <div class="resume-edu-row"><span>KINI</span><div><strong>Kolej Vokasional Kluang</strong><small>Diploma Teknologi Maklumat • Semester 1</small></div></div>
+              <div class="resume-edu-row"><span>2021–2024</span><div><strong>SMK Felda Tenggaroh</strong><small>Pendidikan Menengah</small></div></div>
+              <div class="resume-edu-row"><span>2015–2020</span><div><strong>SK Tunjuk Laut</strong><small>Pendidikan Rendah</small></div></div>
+            </section>
+
+            <div class="resume-summary-grid">
+              <section class="resume-section-card">
+                <h4>Kemahiran</h4>
+                <ul><li>JavaScript, HTML & asas CSS</li><li>Networking, hardware & troubleshooting</li><li>Graphic design, video editing & Canva</li><li>Komunikasi, kreativiti & kerja berpasukan</li></ul>
+              </section>
+              <section class="resume-section-card">
+                <h4>Perisian</h4>
+                <ul><li>Visual Studio Code & Cisco Packet Tracer</li><li>Canva & aplikasi video editing</li><li>Microsoft Word, PowerPoint & asas Excel</li></ul>
+              </section>
+            </div>
+
+            <div class="resume-contact-links resume-contact-footer">
+              <a href="hubungi.html">Lihat halaman Hubungi Saya <span>→</span></a>
+            </div>
+          </div>
+        </div>`
+    });
+    resumeButton.addEventListener('click', resume.open);
+  }
+
+  // Galeri sijil — pratonton sijil sebenar.
+  document.querySelectorAll('[data-cert-preview]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const title = button.dataset.certTitle || 'Sijil';
+      const kind = button.dataset.certKind || 'SIJIL';
+      const image = button.dataset.certImage || '';
+      const desc = button.dataset.certDesc || 'Sijil penyertaan dan pencapaian yang menjadi sebahagian daripada perjalanan pembelajaran saya.';
+      const bodyHTML = image
+        ? `
+          <figure class="certificate-lightbox-figure">
+            <img class="certificate-lightbox-photo" src="${image}" alt="${title}">
+            <figcaption class="certificate-lightbox-caption">
+              <small>${kind}</small>
+              <h4>${title}</h4>
+              <p>${desc}</p>
+            </figcaption>
+          </figure>`
+        : `
+          <div class="certificate-lightbox-sheet">
+            <div class="certificate-sheet-content">
+              <div class="certificate-sheet-mark">✦</div>
+              <small>${kind}</small>
+              <h4>${title}</h4>
+              <p>${desc}</p>
+            </div>
+          </div>`;
+      const preview = createModal({
+        id: `certificateModal-${Math.random().toString(36).slice(2)}`,
+        kicker: 'PRATONTON / GALERI SIJIL',
+        title,
+        bodyHTML
+      });
+      preview.open();
+      preview.modal.addEventListener('transitionend', () => {
+        if (!preview.modal.classList.contains('is-open')) preview.modal.remove();
+      }, { once: true });
+    });
+  });
+
+  // Credits / sumber pada footer semua halaman.
+  const footer = document.querySelector('.footer-inner');
+  if (footer && !footer.querySelector('.credits-button')) {
+    const creditButton = document.createElement('button');
+    creditButton.className = 'credits-button';
+    creditButton.type = 'button';
+    creditButton.textContent = 'CREDITS / SUMBER';
+    footer.appendChild(creditButton);
+
+    const credits = createModal({
+      id: 'creditsModal',
+      kicker: 'ETIKA SUMBER DIGITAL',
+      title: 'Credits / Sumber',
+      bodyHTML: `
+        <dl class="credit-list">
+          <div class="credit-row"><dt>Gambar profil</dt><dd>Koleksi peribadi / gambar sendiri.</dd></div>
+          <div class="credit-row"><dt>Reka bentuk web</dt><dd>Dibangunkan menggunakan HTML, CSS dan JavaScript dalam Visual Studio Code.</dd></div>
+          <div class="credit-row"><dt>Ikon / simbol</dt><dd>Simbol sistem dan aksara Unicode yang digunakan sebagai elemen antaramuka.</dd></div>
+          <div class="credit-row"><dt>Audio / muzik</dt><dd>Sumber dan kredit audio akhir akan dimasukkan selepas rakaman suara serta muzik final dipilih.</dd></div>
+          <div class="credit-row"><dt>Bahan tambahan</dt><dd>Setiap gambar, video atau sijil luar yang digunakan akan dikreditkan mengikut sumber asal sebelum penyerahan.</dd></div>
+        </dl>`
+    });
+    creditButton.addEventListener('click', credits.open);
+  }
+
+  // Back to top bubble — muncul hanya selepas scroll supaya skrin kekal bersih.
+  const backTop = document.createElement('button');
+  backTop.className = 'back-to-top';
+  backTop.type = 'button';
+  backTop.setAttribute('aria-label', 'Kembali ke atas');
+  backTop.title = 'Kembali ke atas';
+  backTop.innerHTML = '<span>↑</span>';
+  document.body.appendChild(backTop);
+
+  const syncBackTop = () => backTop.classList.toggle('is-visible', window.scrollY > 520);
+  window.addEventListener('scroll', syncBackTop, { passive: true });
+  backTop.addEventListener('click', () => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+  syncBackTop();
+})();
+
+/* =====================================================
+   Dynamic page enhancement selepas navigasi lancar.
+   Fungsi ini hanya digunakan apabila kandungan halaman diganti tanpa reload,
+   supaya kad projek, borang, sijil dan animasi tetap berfungsi.
+   ===================================================== */
+(() => {
+  const revealSelectors = [
+    '.hero-section', '.page-intro', '.career-hero', '.statement-band',
+    '.intro-grid', '.audio-panel', '.info-card', '.skill-panel',
+    '.timeline-item', '.project-card', '.experience-item',
+    '.achievement-card', '.goal-card', '.contact-card', '.contact-form',
+    '.project-video-showcase', '.skill-command-center', '.skill-module-section',
+    '.human-os-section'
+  ];
+
+  const enhanceReveals = (root) => {
+    const items = root.querySelectorAll(revealSelectors.join(','));
+    items.forEach((item) => item.classList.add('scroll-reveal'));
+
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      items.forEach((item) => item.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    items.forEach((item) => observer.observe(item));
+  };
+
+  const enhanceProjectCards = (root) => {
+    root.querySelectorAll('[data-project-card]:not([data-dynamic-ready])').forEach((card) => {
+      card.dataset.dynamicReady = '1';
+      const details = card.querySelector('.project-extra');
+      if (!details) return;
+
+      const toggleDetails = () => {
+        const expanded = card.getAttribute('aria-expanded') === 'true';
+        details.hidden = expanded;
+        card.setAttribute('aria-expanded', String(!expanded));
+      };
+
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('a, button, [data-project-preview]')) return;
+        toggleDetails();
+      });
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          toggleDetails();
+        }
+      });
+    });
+
+    root.querySelectorAll('[data-project-link]:not([data-link-ready])').forEach((link) => {
+      link.dataset.linkReady = '1';
+      link.addEventListener('click', (event) => {
+        if (link.getAttribute('href') === '#') {
+          event.preventDefault();
+          window.alert('Pautan projek belum dimasukkan. Gantikan href="#" dengan pautan hasil kerja sebenar.');
+        }
+      });
+    });
+  };
+
+  const enhanceContactForm = (root) => {
+    const form = root.querySelector('#contactForm:not([data-form-ready])');
+    if (!form) return;
+    form.dataset.formReady = '1';
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const fields = {
+        name: { input: form.elements.name, message: 'Sila masukkan nama.' },
+        email: { input: form.elements.email, message: 'Sila masukkan email yang sah.' },
+        message: { input: form.elements.message, message: 'Sila tulis mesej anda.' }
+      };
+      let valid = true;
+      Object.entries(fields).forEach(([key, field]) => {
+        const error = form.querySelector(`[data-error="${key}"]`);
+        const value = field.input.value.trim();
+        const emailOK = key !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        if (!value || !emailOK) {
+          if (error) error.textContent = field.message;
+          field.input.setAttribute('aria-invalid', 'true');
+          valid = false;
+        } else {
+          if (error) error.textContent = '';
+          field.input.removeAttribute('aria-invalid');
+        }
+      });
+      const status = form.querySelector('.form-status');
+      if (status) {
+        status.textContent = valid
+          ? 'Terima kasih! Borang demo berjaya disemak.'
+          : 'Sila semak ruangan yang ditandakan.';
+      }
+      if (valid) form.reset();
+    });
+  };
+
+  const enhanceResume = (root) => {
+    const resumeButton = root.querySelector('[data-resume-open]:not([data-resume-ready])');
+    if (!resumeButton || typeof window.__portfolioCreateModal !== 'function') return;
+    resumeButton.dataset.resumeReady = '1';
+    const resume = window.__portfolioCreateModal({
+      id: `resumeModal-${Math.random().toString(36).slice(2)}`,
+      kicker: 'RESUME RINGKAS / PROFIL PROFESIONAL',
+      title: 'Nurshakila Marlisa',
+      bodyHTML: `
+        <div class="resume-sheet">
+          <aside class="resume-sidebar">
+            <div class="resume-photo-frame">
+              <img src="images/resume-profile.jpg" alt="Gambar profil Nurshakila Marlisa">
+              <span class="resume-photo-accent" aria-hidden="true"></span>
+            </div>
+            <p class="resume-role-label">PELAJAR TEKNOLOGI MAKLUMAT</p>
+            <div class="resume-side-section">
+              <h4>Maklumat Ringkas</h4>
+              <p><span>Lokasi</span><strong>Kota Tinggi, Johor</strong></p>
+              <p><span>Umur</span><strong>18 Tahun</strong></p>
+              <p><span>Pengajian</span><strong>Diploma Teknologi Maklumat</strong></p>
+            </div>
+            <div class="resume-side-section">
+              <h4>Hubungi</h4>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nurshakilamarlisa@gmail.com" target="_blank" rel="noopener noreferrer">✉ <span>Email</span></a>
+              <a href="https://www.wasap.my/60197080852/" target="_blank" rel="noopener noreferrer">◉ <span>0197080852</span></a>
+            </div>
+          </aside>
+
+          <div class="resume-main">
+            <header class="resume-name-header">
+              <span class="resume-small-label">RESUME DIGITAL</span>
+              <h4>Nurshakila Marlisa Binti Abdullah</h4>
+              <p>Pelajar Diploma Teknologi Maklumat Semester 1 • Kolej Vokasional Kluang</p>
+              <div class="resume-mini-tags"><span>Web</span><span>Grafik</span><span>Multimedia</span></div>
+            </header>
+
+            <div class="resume-summary-grid">
+              <section class="resume-section-card">
+                <h4>Profil</h4>
+                <p>Berminat dalam pembangunan web, grafik dan multimedia. Suka mencuba perkara baharu, meneroka idea kreatif dan menambah baik hasil kerja dari semasa ke semasa.</p>
+              </section>
+              <section class="resume-section-card">
+                <h4>Fokus Kerjaya</h4>
+                <p>Pembangunan Web & Multimedia — menggabungkan teknologi, reka bentuk dan kreativiti untuk menghasilkan pengalaman digital yang menarik dan mudah digunakan.</p>
+              </section>
+            </div>
+
+            <section class="resume-section-card resume-education">
+              <h4>Pendidikan</h4>
+              <div class="resume-edu-row"><span>KINI</span><div><strong>Kolej Vokasional Kluang</strong><small>Diploma Teknologi Maklumat • Semester 1</small></div></div>
+              <div class="resume-edu-row"><span>2021–2024</span><div><strong>SMK Felda Tenggaroh</strong><small>Pendidikan Menengah</small></div></div>
+              <div class="resume-edu-row"><span>2015–2020</span><div><strong>SK Tunjuk Laut</strong><small>Pendidikan Rendah</small></div></div>
+            </section>
+
+            <div class="resume-summary-grid">
+              <section class="resume-section-card">
+                <h4>Kemahiran</h4>
+                <ul><li>JavaScript, HTML & asas CSS</li><li>Networking, hardware & troubleshooting</li><li>Graphic design, video editing & Canva</li><li>Komunikasi, kreativiti & kerja berpasukan</li></ul>
+              </section>
+              <section class="resume-section-card">
+                <h4>Perisian</h4>
+                <ul><li>Visual Studio Code & Cisco Packet Tracer</li><li>Canva & aplikasi video editing</li><li>Microsoft Word, PowerPoint & asas Excel</li></ul>
+              </section>
+            </div>
+
+            <div class="resume-contact-links resume-contact-footer">
+              <a href="hubungi.html">Lihat halaman Hubungi Saya <span>→</span></a>
+            </div>
+          </div>
+        </div>`
+    });
+    resumeButton.addEventListener('click', resume.open);
+  };
+
+  const enhanceSkills = (root) => {
+    if (typeof window.__portfolioCreateModal !== 'function') return;
+    root.querySelectorAll('[data-skill-name]:not([data-skill-ready])').forEach((button) => {
+      button.dataset.skillReady = '1';
+      button.addEventListener('click', () => {
+        const name = button.dataset.skillName || 'Kemahiran';
+        const category = button.dataset.skillCategory || 'Kemahiran';
+        const level = Math.max(0, Math.min(100, Number(button.dataset.skillLevel || 0)));
+        const detail = button.dataset.skillDetail || 'Kemahiran yang sedang saya kembangkan melalui pembelajaran dan latihan.';
+        const preview = window.__portfolioCreateModal({
+          id: `skillModal-${Math.random().toString(36).slice(2)}`,
+          kicker: 'SKILL SCAN / PROFIL KEUPAYAAN',
+          title: name,
+          bodyHTML: `
+            <div class="skill-detail-card">
+              <div class="skill-detail-meter" style="--detail-level:${level}%"><strong>${level}</strong></div>
+              <div class="skill-detail-copy">
+                <small>${category}</small>
+                <h4>${name}</h4>
+                <p>${detail}</p>
+                <span class="skill-detail-tag">SEDANG DIKEMBANGKAN • 2026</span>
+              </div>
+            </div>`
+        });
+        preview.open();
+        preview.modal.addEventListener('transitionend', () => {
+          if (!preview.modal.classList.contains('is-open')) preview.modal.remove();
+        }, { once: true });
+      });
+    });
+  };
+
+  const enhanceCertificates = (root) => {
+    if (typeof window.__portfolioCreateModal !== 'function') return;
+    root.querySelectorAll('[data-cert-preview]:not([data-cert-ready])').forEach((button) => {
+      button.dataset.certReady = '1';
+      button.addEventListener('click', () => {
+        const title = button.dataset.certTitle || 'Sijil';
+        const kind = button.dataset.certKind || 'SIJIL';
+        const image = button.dataset.certImage || '';
+        const desc = button.dataset.certDesc || 'Sijil penyertaan dan pencapaian yang menjadi sebahagian daripada perjalanan pembelajaran saya.';
+        const bodyHTML = image
+          ? `
+            <figure class="certificate-lightbox-figure">
+              <img class="certificate-lightbox-photo" src="${image}" alt="${title}">
+              <figcaption class="certificate-lightbox-caption">
+                <small>${kind}</small>
+                <h4>${title}</h4>
+                <p>${desc}</p>
+              </figcaption>
+            </figure>`
+          : `
+            <div class="certificate-lightbox-sheet">
+              <div class="certificate-sheet-content">
+                <div class="certificate-sheet-mark">✦</div>
+                <small>${kind}</small>
+                <h4>${title}</h4>
+                <p>${desc}</p>
+              </div>
+            </div>`;
+        const preview = window.__portfolioCreateModal({
+          id: `certificateModal-${Math.random().toString(36).slice(2)}`,
+          kicker: 'PRATONTON / GALERI SIJIL',
+          title,
+          bodyHTML
+        });
+        preview.open();
+        preview.modal.addEventListener('transitionend', () => {
+          if (!preview.modal.classList.contains('is-open')) preview.modal.remove();
+        }, { once: true });
+      });
+    });
+  };
+
+  window.__portfolioEnhanceDynamicContent = (root = document) => {
+    if (!root) return;
+    enhanceReveals(root);
+    enhanceProjectCards(root);
+    enhanceContactForm(root);
+    enhanceResume(root);
+    enhanceCertificates(root);
+    enhanceSkills(root);
+    document.querySelectorAll('[data-year]').forEach((element) => {
+      element.textContent = new Date().getFullYear();
+    });
+  };
+
+  // Jika pengguna membuka kemahiran.html secara terus, aktifkan popup skill sekali.
+  enhanceSkills(document);
+})();
+
+
+/* Project preview controls -- delegated so they keep working after seamless page changes. */
+(() => {
+  const get = (selector) => document.querySelector(selector);
+  const closeNetwork = () => {
+    const modal = get('#networkProjectPreview');
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    const trigger = get('[data-project-preview="network"]');
+    if (trigger) trigger.focus();
+  };
+  const closeDashboard = () => {
+    const modal = get('#dashboardProjectPreview');
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    const iframe = modal.querySelector('iframe[data-src]');
+    if (iframe) window.setTimeout(() => {
+      if (!modal.classList.contains('is-open')) iframe.removeAttribute('src');
+    }, 180);
+  };
+  const closeChooser = () => {
+    const chooser = get('#dashboardThemeChooser');
+    if (!chooser) return;
+    chooser.classList.remove('is-open');
+    chooser.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.addEventListener('click', (event) => {
+    const networkTrigger = event.target.closest('[data-project-preview="network"]');
+    if (networkTrigger) {
+      const modal = get('#networkProjectPreview');
+      if (modal) {
+        event.preventDefault();
+        event.stopPropagation();
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+      }
+      return;
+    }
+
+    if (event.target.closest('[data-project-preview-close]')) {
+      if (get('#networkProjectPreview')?.classList.contains('is-open')) { closeNetwork(); return; }
+    }
+
+    const dashboardTrigger = event.target.closest('[data-project-preview="dashboard"]');
+    if (dashboardTrigger) {
+      const modal = get('#dashboardProjectPreview');
+      if (modal) {
+        event.preventDefault();
+        event.stopPropagation();
+        const iframe = modal.querySelector('iframe[data-src]');
+        if (iframe && !iframe.getAttribute('src')) iframe.setAttribute('src', iframe.dataset.src);
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+      }
+      return;
+    }
+
+    if (event.target.closest('[data-dashboard-close]')) {
+      if (get('#dashboardProjectPreview')?.classList.contains('is-open')) { closeDashboard(); return; }
+    }
+
+    const themeTrigger = event.target.closest('[data-theme-entry]');
+    if (themeTrigger) {
+      const chooser = get('#dashboardThemeChooser');
+      if (chooser) {
+        event.preventDefault();
+        event.stopPropagation();
+        chooser.classList.add('is-open');
+        chooser.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+      }
+      return;
+    }
+
+    const themeChoice = event.target.closest('[data-theme-choice]');
+    if (themeChoice) {
+      const chooser = get('#dashboardThemeChooser');
+      if (chooser?.classList.contains('is-open')) {
+        event.preventDefault();
+        event.stopPropagation();
+        const theme = themeChoice.dataset.themeChoice;
+        try { localStorage.setItem('project3-theme', theme); } catch (_) {}
+        window.open(`project3-dashboard/index.html?theme=${theme}`, '_blank', 'noopener,noreferrer');
+        closeChooser();
+      }
+      return;
+    }
+
+    if (event.target.closest('[data-theme-choice-close]')) {
+      if (get('#dashboardThemeChooser')?.classList.contains('is-open')) closeChooser();
+    }
+  }, true);
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (get('#dashboardThemeChooser')?.classList.contains('is-open')) closeChooser();
+    if (get('#dashboardProjectPreview')?.classList.contains('is-open')) closeDashboard();
+    if (get('#networkProjectPreview')?.classList.contains('is-open')) closeNetwork();
+  });
+})();
