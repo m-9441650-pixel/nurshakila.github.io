@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio digital MY IT JOURNEY.">
+  <title>MY IT JOURNEY | Nurshakila Marlisa</title>
+  <script data-theme-bootstrap>
+    try {
+      const saved = localStorage.getItem('my-it-journey-theme');
+      document.documentElement.dataset.theme = saved === 'dark' ? 'dark' : 'light';
+    } catch (_) { document.documentElement.dataset.theme = 'light'; }
+  </script>
+  <script data-intro-bootstrap>
+    try {
+      if (!sessionStorage.getItem('my-it-journey-intro-shown')) {
+        document.documentElement.classList.add('intro-pending');
+      }
+    } catch (_) {}
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="site-intro-loader" aria-hidden="true">
+    <span class="intro-sparkle sparkle-a">✦</span>
+    <span class="intro-sparkle sparkle-b">✦</span>
+    <span class="intro-sparkle sparkle-c">✦</span>
+    <div class="intro-card">
+      <div class="intro-hello">HELLO! <span>👋</span></div>
+      <div class="intro-logo">
+        <span class="intro-orbit orbit-a"></span>
+        <span class="intro-orbit orbit-b"></span>
+        <span class="intro-core">&lt;/&gt;</span>
+        <span class="intro-chip chip-html">HTML</span>
+        <span class="intro-chip chip-css">CSS</span>
+        <span class="intro-chip chip-js">JS</span>
+      </div>
+      <p class="intro-title">MY IT JOURNEY</p>
+      <p class="intro-subtitle">WELCOME TO MY DIGITAL PORTFOLIO</p>
+      <div class="intro-loading-line"><span></span></div>
+    </div>
+  </div>
+  <!-- Banner utama dikongsi oleh semua halaman -->
+  <header class="site-banner">
+    <div class="banner-grid"></div>
+    <div class="banner-content">
+      <p class="eyebrow">PORTFOLIO DIGITAL SAYA / PELAJAR DIPLOMA TEKNOLOGI MAKLUMAT</p>
+      <h1>MY IT JOURNEY</h1>
+      <p class="banner-tagline">Membina idea, Menyelesaikan masalah, Mencipta masa depan.</p>
+    </div>
+  </header>
+
+  <!-- Floating menu navigasi -->
+  <nav class="floating-nav" aria-label="Navigasi utama">
+    <a class="active" href="index.html"><span>⌂</span> HOME</a>
+    <a href="profil.html"><span>◎</span> PROFIL DIRI</a>
+    <a href="kemahiran.html"><span>◇</span> KEMAHIRAN</a>
+    <a href="pendidikan.html"><span>▤</span> PENDIDIKAN &amp; KELAYAKAN</a>
+    <a href="projek.html"><span>▣</span> PROJEK / HASIL KERJA</a>
+    <a href="pengalaman.html"><span>◷</span> PENGALAMAN &amp; PENCAPAIAN</a>
+    <a href="kerjaya.html"><span>↗</span> MATLAMAT KERJAYA</a>
+    <a href="hubungi.html"><span>✉</span> HUBUNGI SAYA</a>
+  </nav>
+
+  <main>
+    <section class="hero-section page-shell">
+      <div class="hero-copy reveal">
+        <p class="section-kicker">SELAMAT DATANG / PORTFOLIO SAYA !</p>
+        <h2 class="home-name">Nurshakila Marlisa</h2>
+        <p class="lead hero-introduction"><strong>Hai, saya Kila!</strong> Saya merupakan pelajar <strong>Diploma Teknologi Maklumat Semester 1</strong> di <strong>Kolej Vokasional Kluang</strong>. Saya paling berminat dalam <strong>pembangunan web, grafik dan multimedia</strong> kerana saya suka menggabungkan teknologi dengan kreativiti. Portfolio ini memaparkan perjalanan pembelajaran, kemahiran, projek dan matlamat kerjaya saya dalam bidang Teknologi Maklumat.</p>
+        <p class="personal-motto">“Setiap percubaan adalah sebahagian daripada perjalanan.”</p>
+        
+        <div class="button-row">
+          <a class="button button-primary hero-cta" href="profil.html">Terokai Perjalanan Saya <span>→</span></a>
+          <a class="button button-quiet" href="projek.html">Lihat Hasil Kerja</a>
+          <button class="button button-resume" type="button" data-resume-open>LIHAT RESUME <span>▤</span></button>
+        </div>
+      </div>
+      <div class="profile-hero reveal reveal-delay">
+        <div class="image-frame profile-frame">
+          <img src="images/profile-edited.jpg" alt="Gambar profil Nurshakila Marlisa">
+          <span class="image-label"></span>
+        </div>
+        <div class="name-plate home-name-plate">
+          <span class="status-dot"></span>
+          <div><strong>Nurshakila Marlisa Binti Abdullah</strong><small>Diploma Teknologi Maklumat • Semester 1</small></div>
+          <span class="plate-mark"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="tech-stack-strip page-shell" aria-label="Teknologi yang digunakan">
+      <div class="tech-stack-heading">
+        <p class="section-kicker">TECH STACK / DIBANGUNKAN DENGAN</p>
+        <p class="muted">Empat teknologi utama yang menyokong portfolio ini.</p>
+      </div>
+      <div class="tech-bubbles">
+        <span class="tech-bubble"><b>&lt;/&gt;</b><strong>HTML</strong></span>
+        <span class="tech-bubble"><b>#</b><strong>CSS</strong></span>
+        <span class="tech-bubble"><b>JS</b><strong>JavaScript</strong></span>
+        <span class="tech-bubble"><b>VS</b><strong>VS Code</strong></span>
+      </div>
+    </section>
+
+    <section class="statement-band">
+      <div class="page-shell statement-layout">
+        <p class="section-kicker">PERNYATAAN DIRI / KERJAYA</p>
+        <blockquote>“Saya merupakan seorang pelajar Teknologi Maklumat yang sedang membina pengetahuan dan kemahiran dalam bidang teknologi digital. Melalui pelbagai tugasan dan projek, saya berusaha untuk meningkatkan kemahiran serta mendapatkan pengalaman yang dapat membantu saya dalam membina kerjaya pada masa akan datang.”</blockquote>
+        <span class="line-mark">//</span>
+      </div>
+    </section>
+
+    <section class="page-shell intro-grid">
+      <div><p class="section-kicker">PETA PERJALANAN</p><h2>SATU PORTFOLIO.<br><em>PELBAGAI KEMUNGKINAN.</em></h2></div>
+      <div class="intro-text"><p>Selain bidang IT, saya juga berminat dengan bidang Graphic Design &amp; Multimedia. Terokai latar belakang, kemahiran, projek dan matlamat kerjaya saya melalui lapan bahagian yang disusun ringkas.</p><a class="text-link" href="kemahiran.html">Teruskan meneroka  <span>↗</span></a></div>
+    </section>
+
+    <section class="audio-panel page-shell">
+      <div class="audio-copy"><p class="section-kicker">RUANG KERJA / AUDIO</p><h2>Teman perjalanan</h2><p>Audio portfolio selama 1 minit. Tekan play apabila anda bersedia.</p></div>
+      <div class="custom-audio" data-audio-player>
+        <audio preload="metadata" loop data-audio>
+          <source src="audio/portfolio-1min.mp3" type="audio/mpeg">
+          Pelayar anda tidak menyokong audio.
+        </audio>
+        <button class="audio-play" type="button" data-play aria-label="Mainkan audio">▶</button>
+        <div class="audio-main">
+          <div class="audio-meta"><strong>MY IT JOURNEY</strong><span data-time>0:00 / 1:00</span></div>
+          <input class="audio-progress" data-progress type="range" min="0" max="100" value="0" step="0.1" aria-label="Kemajuan audio">
+        </div>
+        <button class="audio-mute" type="button" data-mute aria-label="Senyapkan audio">🔊</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="page-shell footer-inner"><span>MY IT JOURNEY</span><span>© <span data-year></span> NURSHAKILA MARLISA </span></div></footer>
+  <script src="js/language.js"></script><script src="js/script.js"></script>
+</body>
+</html>

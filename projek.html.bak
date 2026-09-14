@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Projek dan hasil kerja MY IT JOURNEY."><title>MY IT JOURNEY | Projek</title><script data-theme-bootstrap>
+    try {
+      const saved = localStorage.getItem('my-it-journey-theme');
+      document.documentElement.dataset.theme = saved === 'dark' ? 'dark' : 'light';
+    } catch (_) { document.documentElement.dataset.theme = 'light'; }
+  </script>
+  <link rel="stylesheet" href="css/style.css"></head>
+<body>
+  <!-- Banner dan navigasi konsisten -->
+  <header class="site-banner"><div class="banner-grid"></div><div class="banner-content"><p class="eyebrow">PORTFOLIO DIGITAL SAYA / PELAJAR DIPLOMA TEKNOLOGI MAKLUMAT</p><h1>MY IT JOURNEY</h1><p class="banner-tagline">Membina idea, Menyelesaikan masalah, Mencipta masa depan.</p></div></header>
+  <nav class="floating-nav" aria-label="Navigasi utama"><a href="index.html"><span>⌂</span> HOME</a><a href="profil.html"><span>◎</span> PROFIL DIRI</a><a href="kemahiran.html"><span>◇</span> KEMAHIRAN</a><a href="pendidikan.html"><span>▤</span> PENDIDIKAN &amp; KELAYAKAN</a><a class="active" href="projek.html"><span>▣</span> PROJEK / HASIL KERJA</a><a href="pengalaman.html"><span>◷</span> PENGALAMAN &amp; PENCAPAIAN</a><a href="kerjaya.html"><span>↗</span> MATLAMAT KERJAYA</a><a href="hubungi.html"><span>✉</span> HUBUNGI SAYA</a></nav>
+  <main class="projects-page-gempak">
+    <section class="projects-hero page-shell">
+      <div class="projects-hero-decor decor-left" aria-hidden="true">Small<br>Projects<br><span>Big</span><br>Experiences ↘</div>
+      <div class="projects-hero-center">
+        <span class="projects-pill">MY WORK</span>
+        <p class="section-kicker">PROJECTS / 05</p>
+        <h2>PROJECTS</h2>
+        <p class="lead">Koleksi hasil kerja, idea dan pengalaman pembelajaran saya dalam dunia teknologi.</p>
+        <div class="projects-hero-line" aria-hidden="true"></div>
+      </div>
+      <div class="projects-hero-decor decor-right" aria-hidden="true">Ideas<br>into<br><span>Reality</span> ↙</div>
+      <div class="projects-hero-note" aria-hidden="true"><b>✦</b><span>CREATE<br>LEARN<br>IMPROVE<br>REPEAT</span></div>
+    </section>
+
+    <section class="page-shell project-grid project-grid-gempak" aria-label="Senarai projek">
+      <article class="project-card project-card-gempak project-card-featured" data-project-card tabindex="0" aria-expanded="false">
+        <div class="project-image project-image-link">
+          <a href="https://sites.google.com/moe-dl.edu.my/digital-lifestudio/home" target="_blank" rel="noopener noreferrer" aria-label="Buka Digital LifeStudio">
+            <img src="images/digital-life-studio.jpg" alt="Laman utama Digital LifeStudio">
+            <span>01</span><b class="image-link-badge">↗ OPEN</b>
+          </a>
+        </div>
+        <div class="project-body">
+          <div class="project-tags"><span>Website</span><span>Google Sites</span><span>Content</span></div>
+          <p class="section-kicker">WEB / DIGITAL</p>
+          <h3>Digital LifeStudio</h3>
+          <p>Laman web bertemakan gaya hidup digital yang menghimpunkan kandungan, maklumat dan elemen visual berkaitan penggunaan teknologi dalam kehidupan seharian.</p>
+          <a class="button button-small" href="https://sites.google.com/moe-dl.edu.my/digital-lifestudio/home" target="_blank" rel="noopener noreferrer">Lihat Website <span>↗</span></a>
+          <div class="project-card-quote">“A smarter digital life begins with small steps.”</div>
+          <div class="project-extra" hidden><p class="section-kicker">MAKLUMAT TAMBAHAN</p><p>Digital LifeStudio dibangunkan sebagai ruang digital untuk menyampaikan idea dan kandungan berkaitan gaya hidup digital melalui susun atur laman web, imej dan bahan multimedia.</p><p class="muted">Hasil: Sebuah laman web Digital LifeStudio yang boleh diakses secara dalam talian.</p></div>
+        </div>
+      </article>
+
+      <article class="project-card project-card-gempak project-card-network" data-project-card tabindex="0" aria-expanded="false">
+        <div class="project-image project-image-interactive" data-project-preview="network">
+          <img src="images/project2-network.svg" alt="Ilustrasi projek rangkaian Cisco Packet Tracer">
+          <span>02</span><b class="image-preview-badge">＋ QUICK VIEW</b>
+        </div>
+        <div class="project-body">
+          <div class="project-tags"><span>Networking</span><span>Cisco Packet Tracer</span><span>Simulation</span></div>
+          <p class="section-kicker">NETWORK / SIMULATION</p>
+          <h3>Network Design &amp; Configuration</h3>
+          <p>Projek simulasi rangkaian menggunakan Cisco Packet Tracer sebagai latihan mereka bentuk dan memahami struktur rangkaian komputer.</p>
+          <a class="button button-small" href="NURSHAKILA_MARLISA_Network.pkt" download>Lihat Fail Projek <span>↓</span></a>
+          <div class="project-card-quote">“Networks connect devices, but ideas connect people.”</div>
+          <div class="project-extra" hidden><p class="section-kicker">MAKLUMAT TAMBAHAN</p><p>Fail projek Cisco Packet Tracer disediakan sebagai hasil kerja simulasi rangkaian.</p><p class="muted">Hasil: Fail simulasi rangkaian Cisco Packet Tracer (.pkt).</p></div>
+        </div>
+      </article>
+
+      <article class="project-card project-card-gempak project-card-infographic" data-project-card tabindex="0" aria-expanded="false">
+        <div class="project-image project-image-interactive" data-project-preview="dashboard">
+          <img src="images/project3-dashboard-cover-final.jpg" alt="My IT Study Dashboard - Project 03">
+          <span>03</span><b class="image-preview-badge">＋ QUICK VIEW</b>
+        </div>
+        <div class="project-body">
+          <div class="project-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+          <p class="section-kicker">WEB / INTERACTIVE</p>
+          <h3>My IT Study Dashboard</h3>
+          <p>Mini dashboard interaktif yang saya bina untuk menyusun kemahiran, fokus pembelajaran, nota dan matlamat kerjaya dalam satu paparan.</p>
+          <button class="button button-small dashboard-entry-button" type="button" data-theme-entry>Buka Dashboard <span>↗</span></button>
+          <div class="project-card-quote">“Learn. Practice. Create. Improve.”</div>
+          <div class="project-extra" hidden><p class="section-kicker">MAKLUMAT TAMBAHAN</p><p>Projek ini dibangunkan menggunakan HTML, CSS dan JavaScript melalui Visual Studio Code. Ia mempunyai navigasi dalaman, progress kemahiran, checklist dan popup penerangan skill.</p><p class="muted">Hasil: Mini dashboard web interaktif untuk pembelajaran IT.</p></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="page-shell projects-bottom-line" aria-label="Penutup projek">
+      <span></span><p>TURNING IDEAS INTO DIGITAL EXPERIENCES</p><span></span>
+      <div class="projects-coming">◉ &nbsp; More projects coming soon...</div>
+    </section>
+
+    <div class="project-preview-modal" id="networkProjectPreview" aria-hidden="true">
+      <div class="project-preview-backdrop" data-project-preview-close></div>
+      <article class="project-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="networkPreviewTitle">
+        <button class="project-preview-close" type="button" data-project-preview-close aria-label="Tutup paparan projek">×</button>
+        <div class="project-preview-visual"><img src="images/project2-network.svg" alt="Ilustrasi projek Network Design & Configuration"></div>
+        <div class="project-preview-content"><p class="section-kicker">PROJECT 02 / NETWORK</p><h2 id="networkPreviewTitle">Network Design &amp; Configuration</h2><p>Projek simulasi rangkaian menggunakan Cisco Packet Tracer sebagai latihan mereka bentuk dan memahami struktur rangkaian komputer.</p><div class="project-preview-stats"><span><small>TOOLS</small><strong>Cisco Packet Tracer</strong></span><span><small>TYPE</small><strong>Network Simulation</strong></span><span><small>OUTPUT</small><strong>.PKT File</strong></span></div><div class="project-preview-actions"><button class="button button-small" type="button" data-project-preview-close>Tutup</button><a class="button button-small" href="NURSHAKILA_MARLISA_Network.pkt" download>Muat Turun Fail ↓</a></div></div>
+      </article>
+    </div>
+
+    <div class="dashboard-theme-chooser" id="dashboardThemeChooser" aria-hidden="true">
+      <div class="dashboard-theme-backdrop" data-theme-choice-close></div>
+      <article class="dashboard-theme-dialog" role="dialog" aria-modal="true" aria-labelledby="themeChoiceTitle">
+        <button class="dashboard-theme-close" type="button" data-theme-choice-close aria-label="Tutup pilihan tema">×</button>
+        <div class="theme-choice-kicker">PROJECT 03 / MY PERSONAL SPACE</div>
+        <div class="theme-choice-icon">✦</div>
+        <h2 id="themeChoiceTitle">Welcome To My Study Space</h2>
+        <p>Pilih suasana sebelum masuk ke dashboard pembelajaran saya.</p>
+        <div class="theme-choice-grid">
+          <button type="button" class="theme-choice-card theme-choice-light" data-theme-choice="light">
+            <span class="theme-choice-symbol">☼</span><strong>LIGHT MODE</strong><small>Soft • Calm • Focused</small><b>Enter Light →</b>
+          </button>
+          <button type="button" class="theme-choice-card theme-choice-dark" data-theme-choice="dark">
+            <span class="theme-choice-symbol">☾</span><strong>DARK MODE</strong><small>Deep • Creative • Night</small><b>Enter Dark →</b>
+          </button>
+        </div>
+        <div class="theme-choice-footer">Choose your mood • Explore your progress • Keep growing</div>
+      </article>
+    </div>
+
+    <div class="project-preview-modal" id="dashboardProjectPreview" aria-hidden="true">
+      <div class="project-preview-backdrop" data-dashboard-close></div>
+      <article class="project-preview-dialog project-preview-dialog-dashboard" role="dialog" aria-modal="true" aria-labelledby="dashboardPreviewTitle">
+        <button class="project-preview-close" type="button" data-dashboard-close aria-label="Tutup paparan projek">×</button>
+        <div class="dashboard-preview-visual"><iframe src="project3-dashboard/index.html" title="My IT Study Dashboard preview"></iframe></div>
+        <div class="project-preview-content"><p class="section-kicker">PROJECT 03 / WEB & INTERACTIVE</p><h2 id="dashboardPreviewTitle">My IT Study Dashboard</h2><p>Mini dashboard interaktif yang saya bangunkan untuk menyusun kemahiran, fokus pembelajaran, nota dan matlamat kerjaya sebagai pelajar Teknologi Maklumat.</p><div class="project-preview-stats"><span><small>TOOLS</small><strong>HTML • CSS • JavaScript</strong></span><span><small>EDITOR</small><strong>Visual Studio Code</strong></span><span><small>OUTPUT</small><strong>Interactive Web Dashboard</strong></span></div><div class="project-preview-actions"><button class="button button-small" type="button" data-dashboard-close>Tutup</button><a class="button button-small" href="project3-dashboard/index.html" target="_blank" rel="noopener">Buka Dashboard Penuh ↗</a><a class="button button-small" href="project3-dashboard-source.zip" download>Muat Turun Kod ↓</a></div></div>
+      </article>
+    </div>
+
+    <section class="page-shell project-video-showcase">
+      <div class="project-video-copy">
+        <div class="video-heading-row">
+          <p class="section-kicker">ELEMEN MULTIMEDIA / VIDEO</p>
+          <span class="video-live-dot"><i></i> PLAYABLE</span>
+        </div>
+        <h2>MY DIGITAL<br><em>JOURNEY.</em></h2>
+        <p class="lead">Satu paparan ringkas tentang proses saya belajar, mencuba, membina dan meneroka dunia Teknologi Maklumat.</p>
+        <div class="video-specs" aria-label="Spesifikasi video">
+          <div class="video-spec"><small>01</small><div><b>10 SAAT</b><span>Ringkas &amp; padat</span></div></div>
+          <div class="video-spec"><small>02</small><div><b>HD MP4</b><span>Sedia untuk pembentangan</span></div></div>
+          <div class="video-spec"><small>03</small><div><b>MULTIMEDIA</b><span>Video + muzik + teks</span></div></div>
+        </div>
+        <div class="video-note"><span>▶</span><strong>Tekan play untuk melihat video portfolio.</strong></div>
+      </div>
+      <div class="video-frame-3d">
+        <div class="video-frame-topbar" aria-hidden="true"><div class="video-window-dots"><i></i><i></i><i></i></div><span>MY IT JOURNEY / VIDEO SHOWCASE</span><b>10s</b></div>
+        <div class="video-screen-glow" aria-hidden="true"></div>
+        <video controls preload="metadata" playsinline poster="images/video-portfolio-poster.jpg" aria-label="Video My Digital Journey">
+          <source src="video/my-it-journey-demo-10s.mp4" type="video/mp4">
+          Pelayar anda tidak menyokong video HTML5.
+        </video>
+        <div class="video-frame-caption"><span>MY IT JOURNEY</span><span>LEARN • BUILD • CREATE</span></div>
+      </div>
+    </section>
+  </main><footer class="site-footer"><div class="page-shell footer-inner"><span>MY IT JOURNEY</span><span>© <span data-year></span> NURSHAKILA MARLISA </span></div></footer><script src="js/language.js"></script><script src="js/script.js"></script>
+</body></html>
