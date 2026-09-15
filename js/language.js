@@ -105,7 +105,7 @@
   }
   function addSwitcher(){
     const path=window.location.pathname;
-    const isHome=/\/index\.html?$/.test(path) || path.endsWith('/final_old_project_video/') || path.endsWith('/final_old_project_video');
+    const isHome = true;
     if(!isHome)return;
     if(document.querySelector('.language-switcher'))return;const wrap=document.createElement('div');wrap.className='language-switcher';wrap.innerHTML='<button class="language-button" type="button" aria-expanded="false" aria-label="Tukar bahasa">文 <span>BM</span> ▾</button><div class="language-menu"><button data-lang="ms">BM <small>Bahasa Melayu</small></button><button data-lang="en">EN <small>English</small></button><button data-lang="id">ID <small>Bahasa Indonesia</small></button></div>';document.body.appendChild(wrap);const btn=wrap.querySelector('.language-button');btn.addEventListener('click',()=>{const open=wrap.classList.toggle('open');btn.setAttribute('aria-expanded',open)});wrap.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>{applyLanguage(b.dataset.lang);wrap.classList.remove('open');btn.setAttribute('aria-expanded','false')}));document.addEventListener('click',e=>{if(!wrap.contains(e.target)){wrap.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
   }
