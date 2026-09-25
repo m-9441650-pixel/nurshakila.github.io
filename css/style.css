@@ -4461,3 +4461,62 @@ html[data-theme="dark"] .language-menu{background:rgba(17,28,54,.98);border-colo
 html[data-theme="dark"] .language-menu button{color:#eef4ff}
 html[data-theme="dark"] .language-menu small{color:#aab8d4}
 @media(max-width:700px){.language-switcher{right:14px;bottom:14px}.language-button{padding:8px 11px;min-width:70px}}
+
+/* Education timeline cards with school images */
+.education-timeline { max-width: 1160px; }
+.education-card {
+  display: grid;
+  grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
+  gap: 34px;
+  align-items: center;
+  padding: 28px;
+  border-radius: 28px;
+}
+.education-image-wrap {
+  overflow: hidden;
+  border-radius: 22px;
+  aspect-ratio: 4 / 3;
+  background: rgba(255,255,255,.06);
+}
+.education-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.education-copy { min-width: 0; }
+.education-copy h3 { margin: 6px 0 12px; }
+.education-copy > p:not(.section-kicker):not(.muted) { margin: 0 0 18px; }
+.education-location {
+  display: block;
+  margin: 0 0 22px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  color: #8d6cff;
+  background: rgba(141,108,255,.10);
+  text-decoration: none;
+  font-weight: 900;
+  transition: transform .2s ease, background .2s ease;
+}
+.education-location:hover,
+.education-location:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(141,108,255,.16);
+  outline: none;
+}
+.education-copy .muted { margin-bottom: 0; line-height: 1.7; }
+
+html[data-theme="light"] .education-location {
+  background: rgba(141,108,255,.09);
+  color: #8062f2;
+}
+
+@media (max-width: 900px) {
+  .education-card { grid-template-columns: 1fr; gap: 22px; }
+  .education-image-wrap { max-width: 520px; width: 100%; }
+}
+
+@media (max-width: 760px) {
+  .education-card { padding: 20px; border-radius: 22px; }
+  .education-location { padding: 14px 16px; }
+}
